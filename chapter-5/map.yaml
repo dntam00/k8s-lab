@@ -1,0 +1,21 @@
+apiVersion: v1
+data:
+  black: |
+    k
+    known as key
+  cyan: |
+    c
+  favorite: |
+    blue
+  magenta: |
+    m
+  text: black
+  yellow: |
+    y
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2025-03-14T09:12:34Z"
+  name: colors
+  namespace: default
+  resourceVersion: "9488"
+  uid: 0a38613d-d549-47a7-b02b-594a1fba2972

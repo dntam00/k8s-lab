@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2025-03-14T06:26:29Z"
+  generation: 2
+  labels:
+    app: try1
+  name: try1
+  namespace: default
+  resourceVersion: "846"
+  uid: 2a404c07-e712-460a-947c-a0229a6db382
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: try1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: try1
+    spec:
+      containers:
+      - image: k3d-kaixin-registry:12345/simpleapp:v1.0
+        env:
+        - name: ilike
+          valueFrom:
+            configMapKeyRef:
+              name: colors
+              key: favorite
+        envFrom:
+        - configMapRef:
+            name: colors
+        imagePullPolicy: IfNotPresent
+        name: simpleapp
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 3
+  conditions:
+  - lastTransitionTime: "2025-03-14T06:26:29Z"
+    lastUpdateTime: "2025-03-14T06:26:37Z"
+    message: ReplicaSet "try1-cc6c5f6b4" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2025-03-14T06:28:23Z"
+    lastUpdateTime: "2025-03-14T06:28:23Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2
+  readyReplicas: 3
+  replicas: 3
+  updatedReplicas: 3
