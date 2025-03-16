@@ -1,0 +1,8 @@
+FROM alpine
+RUN mkdir /mnt/nfs-mount-in-docker && \
+    apk add nfs-utils
+CMD mount -v -o mountvers=3,nolock 103.7.41.169:/mnt/shared /mnt/nfs-mount-in-docker && \
+    touch /mnt/nfs-mount-in-docker/file-created-in-docker-nfs-mount
+
+
+# https://github.com/hashicorp/vagrant/issues/12330

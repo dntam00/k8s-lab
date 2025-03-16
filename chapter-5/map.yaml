@@ -1,4 +1,8 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: colors
+  namespace: default
 data:
   black: |
     k
@@ -12,10 +16,3 @@ data:
   text: black
   yellow: |
     y
-kind: ConfigMap
-metadata:
-  creationTimestamp: "2025-03-14T09:12:34Z"
-  name: colors
-  namespace: default
-  resourceVersion: "9488"
-  uid: 0a38613d-d549-47a7-b02b-594a1fba2972
