@@ -51,3 +51,33 @@ kubectl apply -f pvc.yaml
 kubectl apply -f nginx.yaml
 kubectl patch pv nfs-pv -p '{"spec":{"claimRef": null}}'
 ```
+
+
+> **_NOTE:_** Why do we need the volumes section?<br>
+The volumes section in the Pod spec acts as a bridge between the PVC (storage) and the containers inside the Pod. Kubernetes doesn't automatically attach storage just because a PVC exists—you must explicitly declare where and how the storage should be used in the pod.
+
+
+```yaml
+containers:
+  - name: webcont
+    image: nginx
+    volumeMounts:
+      - mountPath: "/var/log/nginx/"
+        name: weblog-pv-storage  # Must match "volumes" name
+  - name: fdlogger
+    image: fluentd
+    volumeMounts:
+      - mountPath: "/var/log"
+        name: weblog-pv-storage  # Must match "volumes" name
+```
+
+- This step actually mounts the volume inside the containers at the given paths (/var/log/nginx/ and /var/log).
+- Without this, the storage won't be accessible inside the containers.
+
+🔹 Why Not Just Use PVC Directly in volumeMounts?
+
+Kubernetes separates storage definition from container usage for flexibility:
+
+- Multiple containers in the same Pod can share the same volume (as in your example).
+- The same PVC can be used in different Pods with different mount paths.
+- You can mix different volume types (PVCs, ConfigMaps, Secrets, etc.).
