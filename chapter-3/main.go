@@ -22,13 +22,16 @@ func main() {
 	r.HandleFunc("/endpoint", func(writer http.ResponseWriter, request *http.Request) {
 		hostname, err := os.Hostname()
 		if err != nil {
-			fmt.Println("error getting hostname: ", err)
-		}
-		_, err = writer.Write([]byte(hostname))
+            writer.WriteHeader(http.StatusInternalServerError)
+            errMsg := fmt.Sprintf("Error getting hostname: %v", err)
+            http.Error(writer, errMsg, http.StatusInternalServerError)
+            return
+        }
+		_, err = writer.Write([]byte(fmt.Sprintf("hostname: %s\n", hostname)))
 		if err != nil {
 			fmt.Println("write error: ", err)
 		}
-	}).Methods("POST")
+	}).Methods("GET")
 
 	srv := &http.Server{
 		Addr:        ":" + "7888",
