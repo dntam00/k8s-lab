@@ -20,7 +20,7 @@ VOLUME /var/log
 ENV PATH="$PATH:/bin/aux"
 ENV CRI_CONFIG_FILE="/var/lib/rancher/k3s/agent/etc/crictl.yaml"
 
-COPY --from=rancher/k3s:v1.32.3-rc2-k3s1-arm64 /bin /bin
+COPY --from=rancher/k3s:v1.32.1-rc2-k3s1 /bin /bin
 
 COPY k3d-entrypoint-nfs.sh /bin/
 

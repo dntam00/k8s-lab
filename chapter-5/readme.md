@@ -71,7 +71,7 @@ containers:
         name: weblog-pv-storage  # Must match "volumes" name
 ```
 
-- This step actually mounts the volume inside the containers at the given paths (/var/log/nginx/ and /var/log).
+- This step actually mounts the volume inside the containers at the given paths (`/var/log/nginx/` and `/var/log`).
 - Without this, the storage won't be accessible inside the containers.
 
 🔹 Why Not Just Use PVC Directly in volumeMounts?
@@ -80,4 +80,14 @@ Kubernetes separates storage definition from container usage for flexibility:
 
 - Multiple containers in the same Pod can share the same volume (as in your example).
 - The same PVC can be used in different Pods with different mount paths.
-- You can mix different volume types (PVCs, ConfigMaps, Secrets, etc.).
+- You can mix different volume types (`PVCs, ConfigMaps, Secrets, etc.`).
+
+## rollback
+
+```bash
+kubectl rollout history deployment try1
+kubectl rollout history deployment try1 --revision=1 > one.out
+kubectl rollout history deployment try1 --revision=2 > two.out
+diff one.out two.out
+kubectl rollout undo deployment try1 --to-revision=1
+```

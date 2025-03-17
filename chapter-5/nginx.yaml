@@ -8,14 +8,20 @@ spec:
     - image: nginx
       name: nginx
       volumeMounts:
-        - mountPath: /usr/share/nginx/html
-          name: nfs-storage
+        # - mountPath: /usr/share/nginx/html
+        #   name: nfs-storage
+        - mountPath: /usr/share/nginx/colors
+          name: colors
       securityContext:
         privileged: true
         capabilities:
           add:
           - NET_ADMIN
   volumes:
-    - name: nfs-storage
-      persistentVolumeClaim:
-        claimName: nfs-pvc
+    # - name: nfs-storage
+    #   persistentVolumeClaim:
+    #     claimName: nfs-pvc
+    - name: colors
+      configMap:
+        defaultMode: 420
+        name: colors
