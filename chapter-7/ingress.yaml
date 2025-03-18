@@ -15,3 +15,10 @@ spec:
             name: custom-webserver-service
             port:
               number: 8080
+      - path: /v2
+        pathType: Prefix
+        backend:
+          service:
+            name: custom-webserver-service-v2
+            port:
+              number: 8080

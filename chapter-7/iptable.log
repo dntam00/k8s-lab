@@ -1,0 +1,192 @@
+Chain PREROUTING (policy ACCEPT 329 packets, 25252 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+  347 26422 KUBE-SERVICES  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */
+    6   450 DOCKER_OUTPUT  0    --  *      *       0.0.0.0/0            192.168.65.254      
+  165 14244 CNI-HOSTPORT-DNAT  0    --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
+
+Chain INPUT (policy ACCEPT 246 packets, 19194 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain OUTPUT (policy ACCEPT 73193 packets, 4402K bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+73421 4418K KUBE-SERVICES  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */
+  284 20080 DOCKER_OUTPUT  0    --  *      *       0.0.0.0/0            192.168.65.254      
+  172 10320 CNI-HOSTPORT-DNAT  0    --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
+
+Chain POSTROUTING (policy ACCEPT 73530 packets, 4426K bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+73379 4416K CNI-HOSTPORT-MASQ  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* CNI portfwd requiring masquerade */
+73522 4426K KUBE-POSTROUTING  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes postrouting rules */
+    0     0 DOCKER_POSTROUTING  0    --  *      *       0.0.0.0/0            192.168.65.254      
+73498 4424K FLANNEL-POSTRTG  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* flanneld masq */
+
+Chain CNI-DN-11027803258b1dc000aac (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 CNI-HOSTPORT-SETMARK  6    --  *      *       10.42.2.0/24         0.0.0.0/0            tcp dpt:80
+    0     0 CNI-HOSTPORT-SETMARK  6    --  *      *       127.0.0.1            0.0.0.0/0            tcp dpt:80
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80 to:10.42.2.4:80
+    0     0 CNI-HOSTPORT-SETMARK  6    --  *      *       10.42.2.0/24         0.0.0.0/0            tcp dpt:443
+    0     0 CNI-HOSTPORT-SETMARK  6    --  *      *       127.0.0.1            0.0.0.0/0            tcp dpt:443
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:443 to:10.42.2.4:443
+
+Chain CNI-HOSTPORT-DNAT (2 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 CNI-DN-11027803258b1dc000aac  6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* dnat name: "cbr0" id: "a9e3220f969aae468e029791fc0918f9c187088c6dd07b5880b587a38ef8cdeb" */ multiport dports 80,443
+
+Chain CNI-HOSTPORT-MASQ (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 MASQUERADE  0    --  *      *       0.0.0.0/0            0.0.0.0/0            mark match 0x2000/0x2000
+
+Chain CNI-HOSTPORT-SETMARK (4 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 MARK       0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* CNI portfwd masquerade mark */ MARK or 0x2000
+
+Chain DOCKER_OUTPUT (2 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            192.168.65.254       tcp dpt:53 to:127.0.0.11:46623
+  290 20530 DNAT       17   --  *      *       0.0.0.0/0            192.168.65.254       udp dpt:53 to:127.0.0.11:57450
+
+Chain DOCKER_POSTROUTING (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 SNAT       6    --  *      *       127.0.0.11           0.0.0.0/0            tcp spt:46623 to:192.168.65.254:53
+    0     0 SNAT       17   --  *      *       127.0.0.11           0.0.0.0/0            udp spt:57450 to:192.168.65.254:53
+
+Chain FLANNEL-POSTRTG (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 RETURN     0    --  *      *       0.0.0.0/0            0.0.0.0/0            mark match 0x4000/0x4000 /* flanneld masq */
+72534 4352K RETURN     0    --  *      *       10.42.2.0/24         10.42.0.0/16         /* flanneld masq */
+   53  4348 RETURN     0    --  *      *       10.42.0.0/16         10.42.2.0/24         /* flanneld masq */
+    0     0 RETURN     0    --  *      *      !10.42.0.0/16         10.42.2.0/24         /* flanneld masq */
+   40  2400 MASQUERADE  0    --  *      *       10.42.0.0/16        !224.0.0.0/4          /* flanneld masq */ random-fully
+    0     0 MASQUERADE  0    --  *      *      !10.42.0.0/16         10.42.0.0/16         /* flanneld masq */ random-fully
+
+Chain KUBE-EXT-CVG3OEGEH7H5P3HQ (5 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* masquerade traffic for kube-system/traefik:websecure external destinations */
+    0     0 KUBE-SVC-CVG3OEGEH7H5P3HQ  0    --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain KUBE-EXT-UQMCRMJZLI3FTLDP (5 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* masquerade traffic for kube-system/traefik:web external destinations */
+    0     0 KUBE-SVC-UQMCRMJZLI3FTLDP  0    --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain KUBE-KUBELET-CANARY (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain KUBE-MARK-MASQ (18 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 MARK       0    --  *      *       0.0.0.0/0            0.0.0.0/0            MARK or 0x4000
+
+Chain KUBE-NODEPORTS (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-EXT-UQMCRMJZLI3FTLDP  6    --  *      *       0.0.0.0/0            127.0.0.0/8          /* kube-system/traefik:web */ tcp dpt:32006 nfacct-name  localhost_nps_accepted_pkts
+    0     0 KUBE-EXT-UQMCRMJZLI3FTLDP  6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/traefik:web */ tcp dpt:32006
+    0     0 KUBE-EXT-CVG3OEGEH7H5P3HQ  6    --  *      *       0.0.0.0/0            127.0.0.0/8          /* kube-system/traefik:websecure */ tcp dpt:30913 nfacct-name  localhost_nps_accepted_pkts
+    0     0 KUBE-EXT-CVG3OEGEH7H5P3HQ  6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/traefik:websecure */ tcp dpt:30913
+
+Chain KUBE-POSTROUTING (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 4080  253K RETURN     0    --  *      *       0.0.0.0/0            0.0.0.0/0            mark match ! 0x4000/0x4000
+    0     0 MARK       0    --  *      *       0.0.0.0/0            0.0.0.0/0            MARK xor 0x4000
+    0     0 MASQUERADE  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service traffic requiring SNAT */ random-fully
+
+Chain KUBE-PROXY-CANARY (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain KUBE-SEP-5QLCJXKJHTQCMMDK (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       10.42.2.2            0.0.0.0/0            /* kube-system/kube-dns:metrics */
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/kube-dns:metrics */ tcp to:10.42.2.2:9153
+
+Chain KUBE-SEP-AVE2LRPBNW6AJSYV (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       172.20.0.4           0.0.0.0/0            /* default/kubernetes:https */
+    4   240 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/kubernetes:https */ tcp to:172.20.0.4:6443
+
+Chain KUBE-SEP-B64FLJOMBS3VRN3X (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       10.42.1.5            0.0.0.0/0            /* kube-system/traefik:web */
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/traefik:web */ tcp to:10.42.1.5:8000
+
+Chain KUBE-SEP-IKOTJUIZ6T4FXO2C (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       10.42.2.2            0.0.0.0/0            /* kube-system/kube-dns:dns-tcp */
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/kube-dns:dns-tcp */ tcp to:10.42.2.2:53
+
+Chain KUBE-SEP-JKTH5NF4JUR7ROQA (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       10.42.2.2            0.0.0.0/0            /* kube-system/kube-dns:dns */
+    0     0 DNAT       17   --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/kube-dns:dns */ udp to:10.42.2.2:53
+
+Chain KUBE-SEP-SMBCUIM24C3OIPRD (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       10.42.1.5            0.0.0.0/0            /* kube-system/traefik:websecure */
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/traefik:websecure */ tcp to:10.42.1.5:8443
+
+Chain KUBE-SEP-ZOBWAOAPCMTR3HGV (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       10.42.2.3            0.0.0.0/0            /* kube-system/metrics-server:https */
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/metrics-server:https */ tcp to:10.42.2.3:10250
+
+Chain KUBE-SEP-ZYT2IH4LNOYMPEO4 (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  0    --  *      *       10.42.0.9            0.0.0.0/0            /* default/custom-webserver-service */
+    0     0 DNAT       6    --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/custom-webserver-service */ tcp to:10.42.0.9:7888
+
+Chain KUBE-SERVICES (2 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-SVC-JD5MR3NA4I4DYORP  6    --  *      *       0.0.0.0/0            10.43.0.10           /* kube-system/kube-dns:metrics cluster IP */ tcp dpt:9153
+    0     0 KUBE-SVC-Z4ANX4WAEWEBLCTM  6    --  *      *       0.0.0.0/0            10.43.25.116         /* kube-system/metrics-server:https cluster IP */ tcp dpt:443
+    0     0 KUBE-SVC-UQMCRMJZLI3FTLDP  6    --  *      *       0.0.0.0/0            10.43.29.31          /* kube-system/traefik:web cluster IP */ tcp dpt:80
+    0     0 KUBE-EXT-UQMCRMJZLI3FTLDP  6    --  *      *       0.0.0.0/0            172.20.0.4           /* kube-system/traefik:web loadbalancer IP */ tcp dpt:80
+    0     0 KUBE-EXT-UQMCRMJZLI3FTLDP  6    --  *      *       0.0.0.0/0            172.20.0.5           /* kube-system/traefik:web loadbalancer IP */ tcp dpt:80
+    0     0 KUBE-EXT-UQMCRMJZLI3FTLDP  6    --  *      *       0.0.0.0/0            172.20.0.6           /* kube-system/traefik:web loadbalancer IP */ tcp dpt:80
+    0     0 KUBE-SVC-CVG3OEGEH7H5P3HQ  6    --  *      *       0.0.0.0/0            10.43.29.31          /* kube-system/traefik:websecure cluster IP */ tcp dpt:443
+    0     0 KUBE-EXT-CVG3OEGEH7H5P3HQ  6    --  *      *       0.0.0.0/0            172.20.0.4           /* kube-system/traefik:websecure loadbalancer IP */ tcp dpt:443
+    0     0 KUBE-EXT-CVG3OEGEH7H5P3HQ  6    --  *      *       0.0.0.0/0            172.20.0.5           /* kube-system/traefik:websecure loadbalancer IP */ tcp dpt:443
+    0     0 KUBE-EXT-CVG3OEGEH7H5P3HQ  6    --  *      *       0.0.0.0/0            172.20.0.6           /* kube-system/traefik:websecure loadbalancer IP */ tcp dpt:443
+    0     0 KUBE-SVC-X7LKUVJ5UIBRAJBP  6    --  *      *       0.0.0.0/0            10.43.247.81         /* default/custom-webserver-service cluster IP */ tcp dpt:8080
+    0     0 KUBE-SVC-NPX46M4PTMTKRN6Y  6    --  *      *       0.0.0.0/0            10.43.0.1            /* default/kubernetes:https cluster IP */ tcp dpt:443
+    0     0 KUBE-SVC-TCOU7JCQXEZGVUNU  17   --  *      *       0.0.0.0/0            10.43.0.10           /* kube-system/kube-dns:dns cluster IP */ udp dpt:53
+    0     0 KUBE-SVC-ERIFXISQEP7F7OF4  6    --  *      *       0.0.0.0/0            10.43.0.10           /* kube-system/kube-dns:dns-tcp cluster IP */ tcp dpt:53
+   35  4480 KUBE-NODEPORTS  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service nodeports; NOTE: this must be the last rule in this chain */ ADDRTYPE match dst-type LOCAL
+
+Chain KUBE-SVC-CVG3OEGEH7H5P3HQ (2 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  6    --  *      *      !10.42.0.0/16         10.43.29.31          /* kube-system/traefik:websecure cluster IP */ tcp dpt:443
+    0     0 KUBE-SEP-SMBCUIM24C3OIPRD  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/traefik:websecure -> 10.42.1.5:8443 */
+
+Chain KUBE-SVC-ERIFXISQEP7F7OF4 (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  6    --  *      *      !10.42.0.0/16         10.43.0.10           /* kube-system/kube-dns:dns-tcp cluster IP */ tcp dpt:53
+    0     0 KUBE-SEP-IKOTJUIZ6T4FXO2C  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/kube-dns:dns-tcp -> 10.42.2.2:53 */
+
+Chain KUBE-SVC-JD5MR3NA4I4DYORP (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  6    --  *      *      !10.42.0.0/16         10.43.0.10           /* kube-system/kube-dns:metrics cluster IP */ tcp dpt:9153
+    0     0 KUBE-SEP-5QLCJXKJHTQCMMDK  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/kube-dns:metrics -> 10.42.2.2:9153 */
+
+Chain KUBE-SVC-NPX46M4PTMTKRN6Y (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  6    --  *      *      !10.42.0.0/16         10.43.0.1            /* default/kubernetes:https cluster IP */ tcp dpt:443
+    4   240 KUBE-SEP-AVE2LRPBNW6AJSYV  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/kubernetes:https -> 172.20.0.4:6443 */
+
+Chain KUBE-SVC-TCOU7JCQXEZGVUNU (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  17   --  *      *      !10.42.0.0/16         10.43.0.10           /* kube-system/kube-dns:dns cluster IP */ udp dpt:53
+    0     0 KUBE-SEP-JKTH5NF4JUR7ROQA  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/kube-dns:dns -> 10.42.2.2:53 */
+
+Chain KUBE-SVC-UQMCRMJZLI3FTLDP (2 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  6    --  *      *      !10.42.0.0/16         10.43.29.31          /* kube-system/traefik:web cluster IP */ tcp dpt:80
+    0     0 KUBE-SEP-B64FLJOMBS3VRN3X  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/traefik:web -> 10.42.1.5:8000 */
+
+Chain KUBE-SVC-X7LKUVJ5UIBRAJBP (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  6    --  *      *      !10.42.0.0/16         10.43.247.81         /* default/custom-webserver-service cluster IP */ tcp dpt:8080
+    0     0 KUBE-SEP-ZYT2IH4LNOYMPEO4  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/custom-webserver-service -> 10.42.0.9:7888 */
+
+Chain KUBE-SVC-Z4ANX4WAEWEBLCTM (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 KUBE-MARK-MASQ  6    --  *      *      !10.42.0.0/16         10.43.25.116         /* kube-system/metrics-server:https cluster IP */ tcp dpt:443
+    0     0 KUBE-SEP-ZOBWAOAPCMTR3HGV  0    --  *      *       0.0.0.0/0            0.0.0.0/0            /* kube-system/metrics-server:https -> 10.42.2.3:10250 */

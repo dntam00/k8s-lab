@@ -19,7 +19,7 @@ func main() {
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 
 	r := mux.NewRouter()
-	r.HandleFunc("/endpoint", func(writer http.ResponseWriter, request *http.Request) {
+	r.HandleFunc("/v2/endpoint", func(writer http.ResponseWriter, request *http.Request) {
 		hostname, err := os.Hostname()
 		if err != nil {
             writer.WriteHeader(http.StatusInternalServerError)
