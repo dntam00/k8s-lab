@@ -39,6 +39,8 @@ func main() {
 		IdleTimeout: 10 * time.Second,
 	}
 
+	fmt.Println("start server")
+
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		fmt.Println("failed to start server")
 		return

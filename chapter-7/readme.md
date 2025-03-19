@@ -47,3 +47,12 @@ host -> lb container -> traefik service -> traefik pod (here is ingress) -> targ
 ```bash
 iptables -t nat -L -n -v
 ```
+
+## Helm
+
+```bash
+kubectl create ns helm-learning
+helm create custom-webserver
+helm -n helm-learning install custom-webserver -f custom-webserver-values.yaml custom-webserver
+helm -n helm-learning uninstall custom-webserver
+```

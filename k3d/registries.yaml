@@ -1,0 +1,11 @@
+mirrors:
+  k3d-kaixin-registry:5000:
+    endpoint:
+    - http://k3d-kaixin-registry:5000
+    rewrite: {}
+  k3d-kaixin-registry:12345:
+    endpoint:
+    - http://k3d-kaixin-registry:5000
+    rewrite: {}
+configs: {}
+auths: {}

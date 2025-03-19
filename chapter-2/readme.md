@@ -28,4 +28,5 @@ kubectl get deploy,rs,po,svc,ep
 ```
 kubectl get namespaces
 kubectl get pod --all-namespaces
+kubectl config set-context --current --namespace=helm-learning
 ```
