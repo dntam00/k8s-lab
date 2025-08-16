@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: log-demo
+  template:
+    metadata:
+      labels:
+        app: log-demo
+    spec:
+      containers:
+        - name: log-demo
+          image: k3d-kaixin-registry:12345/log-demo:v1.0
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: host-storage
+              mountPath: /logs
+              subPathExpr: $(POD_NAME)
+      volumes:
+        - name: host-storage
+          hostPath:
+            path: /apps/logs
+            type: DirectoryOrCreate
