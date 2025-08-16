@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hostpath-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hostpath-demo
+  template:
+    metadata:
+      labels:
+        app: hostpath-demo
+    spec:
+      containers:
+        - name: hostpath-demo
+          image: k3d-kaixin-registry:12345/hostpath-demo:v1.0
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: host-storage
+              mountPath: /data
+              subPathExpr: $(POD_NAME)
+      volumes:
+        - name: host-storage
+          hostPath:
+            path: /tmp/k8s-hostpath
+            type: DirectoryOrCreate
