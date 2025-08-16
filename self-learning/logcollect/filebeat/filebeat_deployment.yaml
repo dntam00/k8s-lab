@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  namespace: logging
+  labels:
+    k8s-app: filebeat
+spec:
+  selector:
+    matchLabels:
+      k8s-app: filebeat
+  template:
+    metadata:
+      labels:
+        k8s-app: filebeat
+    spec:
+      serviceAccountName: filebeat
+      containers:
+        - name: filebeat
+          image: docker.elastic.co/beats/filebeat:8.15.2
+          args: ["-c", "/etc/filebeat.yml", "-e"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/filebeat.yml
+              subPath: filebeat.yml
+            - name: logs
+              mountPath: /apps/logs
+      volumes:
+        - name: config
+          configMap:
+            name: filebeat-config
+        - name: logs
+          hostPath:
+            path: /apps/logs
+            type: DirectoryOrCreate

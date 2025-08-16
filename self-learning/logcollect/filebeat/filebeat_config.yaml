@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: logging
+data:
+  filebeat.yml: |
+    filebeat.inputs:
+      - type: log
+        enabled: true
+        paths:
+          - /apps/logs/**/*.log   # watch your hostPath logs
+        scan_frequency: 10s
+        multiline:
+          pattern: '^[[:space:]]'
+          negate: false
+          match: after
+
+    # Send to Elasticsearch
+    output.elasticsearch:
+      hosts: ["http://elasticsearch:9200"] # service of your ES
+      # username: ""        # set if security enabled
+      # password: ""       # set if security enabled
+
+    setup.ilm.enabled: false      # disable ILM if you don’t use it
+    setup.template.enabled: true
+    setup.ilm.pattern: "{now/d}-000001"
