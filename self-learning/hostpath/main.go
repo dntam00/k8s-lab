@@ -11,6 +11,8 @@ func main() {
 	podName := os.Getenv("POD_NAME")
 	log.Printf("POD_NAME env: %s", podName)
 
+	panic("this is a panic test")
+
 	// Ensure /data directory exists
 	if err := os.MkdirAll("/data", 0755); err != nil {
 		log.Fatalf("failed to create /data directory: %v", err)
